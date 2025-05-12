@@ -14,6 +14,7 @@ using Robust.Shared.Configuration;
 using Robust.Shared.Input;
 using Robust.Shared.Player;
 using Robust.Shared.Utility;
+using System.Linq;
 using static Robust.Client.UserInterface.Controls.LineEdit;
 
 namespace Content.Client.UserInterface.Systems.Chat.Widgets;
@@ -151,6 +152,13 @@ public partial class ChatBox : UIWidget
     public void Repopulate()
     {
         Contents.Clear();
+        foreach (var child in Contents.Children.ToArray())
+        {
+            if (child.Name != "_v_scroll")
+            {
+                Contents.RemoveChild(child);
+            }
+        }
         _chatStackList = new List<ChatStackData>(_chatStackAmount);
         foreach (var message in _controller.History)
         {
@@ -161,6 +169,13 @@ public partial class ChatBox : UIWidget
     private void OnChannelFilter(ChatChannel channel, bool active)
     {
         Contents.Clear();
+        foreach (var child in Contents.Children.ToArray())
+        {
+            if (child.Name != "_v_scroll")
+            {
+                Contents.RemoveChild(child);
+            }
+        }
 
         foreach (var message in _controller.History)
         {
@@ -177,13 +192,13 @@ public partial class ChatBox : UIWidget
     {
         var formatted = new FormattedMessage(4); 
         formatted.PushColor(color);
-        formatted.AddMarkup(message);
+        formatted.AddMarkupOrThrow(message);
         formatted.Pop();
         if (repeat != 0)
         {
             int displayRepeat = repeat + 1;
             int sizeIncrease = Math.Min(displayRepeat / 6, 5);
-            formatted.AddMarkup(_loc.GetString("chat-system-repeated-message-counter",
+            formatted.AddMarkupOrThrow(_loc.GetString("chat-system-repeated-message-counter",
                                 ("count", displayRepeat),
                                 ("size", 8 + sizeIncrease)
                                 ));
